@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-script: 'Alex Brush', cursive;
+
+  --color-gold-50: #faf6ed;
+  --color-gold-100: #f3ebdb;
+  --color-gold-200: #e8d7ba;
+  --color-gold-300: #dbbf92;
+  --color-gold-400: #cca06b;
+  --color-gold-500: #b88647;
+  --color-gold-600: #9e6d37;
+  --color-gold-700: #7d522c;
+
+  --color-champagne-50: #fcfbf9;
+  --color-champagne-100: #f7f3ed;
+  --color-champagne-200: #eee5d8;
+  --color-champagne-300: #e0d1bc;
+
+  --color-wine-800: #541d27;
+  --color-wine-900: #3b1118;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    background-color: #faf7f2;
+    color: #2b2725;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .font-serif {
+    font-family: var(--font-serif);
+  }
+
+  .font-script {
+    font-family: var(--font-script);
+  }
+}
+
+/* Glassmorphism & Wedding Card Effects */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(224, 209, 188, 0.45);
+}
+
+.glass-panel-dark {
+  background: rgba(26, 21, 18, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(204, 160, 107, 0.25);
+}
+
+.gold-border-gradient {
+  border-image: linear-gradient(to right, #e8d7ba, #cca06b, #e8d7ba) 1;
+}
+
+/* Subtle Shimmer & Animations */
+@keyframes softFloat {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(1deg); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+.animate-soft-float {
+  animation: softFloat 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 4s ease-in-out infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f7f3ed;
+}
+::-webkit-scrollbar-thumb {
+  background: #d6be9a;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #b88647;
+}
