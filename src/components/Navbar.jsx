@@ -5,7 +5,7 @@ import confetti from 'canvas-confetti'
 export default function Navbar({ data, onOpenRsvp }) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [isPlayingMusic, setIsPlayingMusic] = useState(false)
+  const [isPlayingMusic, setIsPlayingMusic] = useState(true)
   const playerRef = useRef(null)
 
   useEffect(() => {
@@ -68,7 +68,7 @@ export default function Navbar({ data, onOpenRsvp }) {
       if (playerRef.current && playerRef.current.destroy) {
         try {
           playerRef.current.destroy()
-        } catch (e) {}
+        } catch (e) { }
       }
     }
   }, [])
@@ -101,15 +101,14 @@ export default function Navbar({ data, onOpenRsvp }) {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled
           ? 'bg-white/85 backdrop-blur-md shadow-sm border-b border-[#cca06b]/20 py-3'
           : 'bg-transparent py-5'
-      }`}
+        }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
-          
+
           {/* Logo / Monogram */}
           <a
             href="#home"
@@ -154,11 +153,10 @@ export default function Navbar({ data, onOpenRsvp }) {
             <button
               onClick={toggleMusic}
               title={isPlayingMusic ? "Pause 'Kudmayi'" : "Play Wedding Song 'Kudmayi'"}
-              className={`flex items-center space-x-2 px-3 py-1.5 rounded-full border text-xs tracking-wide transition-all duration-300 ${
-                isPlayingMusic
+              className={`flex items-center space-x-2 px-3 py-1.5 rounded-full border text-xs tracking-wide transition-all duration-300 ${isPlayingMusic
                   ? 'border-[#cca06b] bg-[#fbf8f1] text-[#b88647] shadow-sm'
                   : 'border-[#cca06b]/30 bg-white/70 text-[#7d6b5c] hover:border-[#cca06b]'
-              }`}
+                }`}
             >
               {isPlayingMusic ? (
                 <Music className="w-3.5 h-3.5 animate-bounce text-[#cca06b]" />
@@ -193,11 +191,10 @@ export default function Navbar({ data, onOpenRsvp }) {
             <button
               onClick={toggleMusic}
               title={isPlayingMusic ? "Pause 'Kudmayi'" : "Play Wedding Song 'Kudmayi'"}
-              className={`p-2 rounded-full border transition-all ${
-                isPlayingMusic
+              className={`p-2 rounded-full border transition-all ${isPlayingMusic
                   ? 'border-[#cca06b] bg-[#fbf8f1] text-[#b88647]'
                   : 'border-[#cca06b]/30 bg-white/70 text-[#7d6b5c]'
-              }`}
+                }`}
             >
               {isPlayingMusic ? <Music className="w-4 h-4 animate-bounce" /> : <VolumeX className="w-4 h-4" />}
             </button>
