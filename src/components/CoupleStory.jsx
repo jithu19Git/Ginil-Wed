@@ -31,9 +31,14 @@ export default function CoupleStory({ data }) {
           
           {/* Groom Card */}
           <div className="lg:col-span-4 order-2 lg:order-1 text-center lg:text-right bg-white/70 backdrop-blur-md p-8 rounded-3xl border border-[#cca06b]/20 shadow-sm hover:shadow-md transition-shadow">
-            <span className="inline-block text-xs uppercase tracking-[0.25em] text-[#cca06b] font-semibold mb-2">
+            <span className="inline-block text-xs uppercase tracking-[0.25em] text-[#cca06b] font-semibold mb-1">
               {data.couple.groom.role}
             </span>
+            {data.couple.groom.profession && (
+              <p className="text-xs uppercase tracking-wider text-[#9e6d37] font-semibold mb-2">
+                {data.couple.groom.profession}
+              </p>
+            )}
             <h3 className="font-serif text-3xl text-[#2b2725] font-light mb-4">
               {data.couple.groom.fullName}
             </h3>
@@ -67,9 +72,14 @@ export default function CoupleStory({ data }) {
 
           {/* Bride Card */}
           <div className="lg:col-span-4 order-3 text-center lg:text-left bg-white/70 backdrop-blur-md p-8 rounded-3xl border border-[#cca06b]/20 shadow-sm hover:shadow-md transition-shadow">
-            <span className="inline-block text-xs uppercase tracking-[0.25em] text-[#cca06b] font-semibold mb-2">
+            <span className="inline-block text-xs uppercase tracking-[0.25em] text-[#cca06b] font-semibold mb-1">
               {data.couple.bride.role}
             </span>
+            {data.couple.bride.profession && (
+              <p className="text-xs uppercase tracking-wider text-[#9e6d37] font-semibold mb-2">
+                {data.couple.bride.profession}
+              </p>
+            )}
             <h3 className="font-serif text-3xl text-[#2b2725] font-light mb-4">
               {data.couple.bride.fullName}
             </h3>
