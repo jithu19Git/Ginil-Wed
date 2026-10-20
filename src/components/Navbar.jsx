@@ -5,7 +5,7 @@ import confetti from 'canvas-confetti'
 export default function Navbar({ data, onOpenRsvp }) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [isPlayingMusic, setIsPlayingMusic] = useState(true)
+  const [isPlayingMusic, setIsPlayingMusic] = useState(false)
   const playerRef = useRef(null)
 
   useEffect(() => {
@@ -18,6 +18,17 @@ export default function Navbar({ data, onOpenRsvp }) {
 
   // Initialize YouTube Player with requested song: "Kudmayi" (e1SAa-9Sm-A)
   useEffect(() => {
+    let hasStarted = false
+
+    const unlockPlayback = () => {
+      if (hasStarted) return
+      if (playerRef.current && typeof playerRef.current.playVideo === 'function') {
+        try {
+          playerRef.current.playVideo()
+        } catch (e) {}
+      }
+    }
+
     const initPlayer = () => {
       if (window.YT && window.YT.Player && !playerRef.current) {
         try {
@@ -26,7 +37,7 @@ export default function Navbar({ data, onOpenRsvp }) {
             width: '120',
             videoId: 'e1SAa-9Sm-A',
             playerVars: {
-              autoplay: 0,
+              autoplay: 1,
               loop: 1,
               playlist: 'e1SAa-9Sm-A',
               controls: 0,
@@ -34,9 +45,15 @@ export default function Navbar({ data, onOpenRsvp }) {
               playsinline: 1,
             },
             events: {
+              onReady: (event) => {
+                try {
+                  event.target.playVideo()
+                } catch (e) {}
+              },
               onStateChange: (event) => {
                 // 1: playing, 2: paused, 0: ended
                 if (event.data === 1) {
+                  hasStarted = true
                   setIsPlayingMusic(true)
                 } else if (event.data === 2 || event.data === 0) {
                   setIsPlayingMusic(false)
@@ -49,6 +66,12 @@ export default function Navbar({ data, onOpenRsvp }) {
         }
       }
     }
+
+    // Modern browsers require a user interaction (click, touch, or scroll) to unlock audio
+    window.addEventListener('click', unlockPlayback, { passive: true })
+    window.addEventListener('touchstart', unlockPlayback, { passive: true })
+    window.addEventListener('scroll', unlockPlayback, { passive: true })
+    window.addEventListener('keydown', unlockPlayback, { passive: true })
 
     if (!window.YT) {
       const tag = document.createElement('script')
@@ -65,6 +88,10 @@ export default function Navbar({ data, onOpenRsvp }) {
     }
 
     return () => {
+      window.removeEventListener('click', unlockPlayback)
+      window.removeEventListener('touchstart', unlockPlayback)
+      window.removeEventListener('scroll', unlockPlayback)
+      window.removeEventListener('keydown', unlockPlayback)
       if (playerRef.current && playerRef.current.destroy) {
         try {
           playerRef.current.destroy()
@@ -102,8 +129,8 @@ export default function Navbar({ data, onOpenRsvp }) {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled
-          ? 'bg-white/85 backdrop-blur-md shadow-sm border-b border-[#cca06b]/20 py-3'
-          : 'bg-transparent py-5'
+        ? 'bg-white/85 backdrop-blur-md shadow-sm border-b border-[#cca06b]/20 py-3'
+        : 'bg-transparent py-5'
         }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -154,8 +181,8 @@ export default function Navbar({ data, onOpenRsvp }) {
               onClick={toggleMusic}
               title={isPlayingMusic ? "Pause 'Kudmayi'" : "Play Wedding Song 'Kudmayi'"}
               className={`flex items-center space-x-2 px-3 py-1.5 rounded-full border text-xs tracking-wide transition-all duration-300 ${isPlayingMusic
-                  ? 'border-[#cca06b] bg-[#fbf8f1] text-[#b88647] shadow-sm'
-                  : 'border-[#cca06b]/30 bg-white/70 text-[#7d6b5c] hover:border-[#cca06b]'
+                ? 'border-[#cca06b] bg-[#fbf8f1] text-[#b88647] shadow-sm'
+                : 'border-[#cca06b]/30 bg-white/70 text-[#7d6b5c] hover:border-[#cca06b]'
                 }`}
             >
               {isPlayingMusic ? (
@@ -192,8 +219,8 @@ export default function Navbar({ data, onOpenRsvp }) {
               onClick={toggleMusic}
               title={isPlayingMusic ? "Pause 'Kudmayi'" : "Play Wedding Song 'Kudmayi'"}
               className={`p-2 rounded-full border transition-all ${isPlayingMusic
-                  ? 'border-[#cca06b] bg-[#fbf8f1] text-[#b88647]'
-                  : 'border-[#cca06b]/30 bg-white/70 text-[#7d6b5c]'
+                ? 'border-[#cca06b] bg-[#fbf8f1] text-[#b88647]'
+                : 'border-[#cca06b]/30 bg-white/70 text-[#7d6b5c]'
                 }`}
             >
               {isPlayingMusic ? <Music className="w-4 h-4 animate-bounce" /> : <VolumeX className="w-4 h-4" />}
