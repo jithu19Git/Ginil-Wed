@@ -17,7 +17,7 @@ export const weddingData = {
     },
     bride: {
       name: "Ammu",
-      fullName: "Ammu Elizabeth",
+      fullName: "Ammu Elizabeth Saji",
       role: "The Bride",
       profession: "Digital Marketer & Fashion Designer",
       description: "Digital Marketer and Fashion Designer with a vibrant artistic soul, an eye for elegance, and the radiant laughter that turned every ordinary day into an enchanting fairytale.",
