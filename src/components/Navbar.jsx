@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Heart, Menu, X, Music, VolumeX, Calendar, Sparkles } from 'lucide-react'
 import confetti from 'canvas-confetti'
 
@@ -6,7 +6,7 @@ export default function Navbar({ data, onOpenRsvp }) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isPlayingMusic, setIsPlayingMusic] = useState(false)
-  const [audioCtx, setAudioCtx] = useState(null)
+  const playerRef = useRef(null)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,54 +16,77 @@ export default function Navbar({ data, onOpenRsvp }) {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Romantic acoustic chime synthesizer using native Web Audio API
-  const toggleAmbientMusic = () => {
-    if (isPlayingMusic) {
-      if (audioCtx) {
-        audioCtx.close()
-        setAudioCtx(null)
-      }
-      setIsPlayingMusic(false)
-    } else {
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)()
-        const notes = [261.63, 329.63, 392.0, 523.25, 440.0, 392.0, 329.63] // C major dreamy arpeggio
-        let step = 0
-
-        const playChime = () => {
-          if (ctx.state === 'closed') return
-          const osc = ctx.createOscillator()
-          const gain = ctx.createGain()
-          osc.type = 'sine'
-          const freq = notes[step % notes.length]
-          osc.frequency.setValueAtTime(freq, ctx.currentTime)
-          
-          gain.gain.setValueAtTime(0.001, ctx.currentTime)
-          gain.gain.exponentialRampToValueAtTime(0.08, ctx.currentTime + 0.1)
-          gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.8)
-
-          osc.connect(gain)
-          gain.connect(ctx.destination)
-
-          osc.start()
-          osc.stop(ctx.currentTime + 2.0)
-
-          step++
+  // Initialize YouTube Player with requested song: "Kudmayi" (e1SAa-9Sm-A)
+  useEffect(() => {
+    const initPlayer = () => {
+      if (window.YT && window.YT.Player && !playerRef.current) {
+        try {
+          playerRef.current = new window.YT.Player('yt-wedding-audio', {
+            height: '120',
+            width: '120',
+            videoId: 'e1SAa-9Sm-A',
+            playerVars: {
+              autoplay: 0,
+              loop: 1,
+              playlist: 'e1SAa-9Sm-A',
+              controls: 0,
+              modestbranding: 1,
+              playsinline: 1,
+            },
+            events: {
+              onStateChange: (event) => {
+                // 1: playing, 2: paused, 0: ended
+                if (event.data === 1) {
+                  setIsPlayingMusic(true)
+                } else if (event.data === 2 || event.data === 0) {
+                  setIsPlayingMusic(false)
+                }
+              },
+            },
+          })
+        } catch (err) {
+          console.warn('YouTube Player initialization notice:', err)
         }
-
-        const intervalId = setInterval(playChime, 800)
-        playChime()
-
-        setAudioCtx({
-          close: () => {
-            clearInterval(intervalId)
-            ctx.close()
-          }
-        })
-        setIsPlayingMusic(true)
-      } catch (e) {
-        console.error('Audio not supported:', e)
       }
+    }
+
+    if (!window.YT) {
+      const tag = document.createElement('script')
+      tag.src = 'https://www.youtube.com/iframe_api'
+      const firstScriptTag = document.getElementsByTagName('script')[0]
+      if (firstScriptTag && firstScriptTag.parentNode) {
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
+      } else {
+        document.body.appendChild(tag)
+      }
+      window.onYouTubeIframeAPIReady = initPlayer
+    } else {
+      initPlayer()
+    }
+
+    return () => {
+      if (playerRef.current && playerRef.current.destroy) {
+        try {
+          playerRef.current.destroy()
+        } catch (e) {}
+      }
+    }
+  }, [])
+
+  const toggleMusic = () => {
+    if (!playerRef.current || typeof playerRef.current.playVideo !== 'function') {
+      return
+    }
+    try {
+      if (isPlayingMusic) {
+        playerRef.current.pauseVideo()
+        setIsPlayingMusic(false)
+      } else {
+        playerRef.current.playVideo()
+        setIsPlayingMusic(true)
+      }
+    } catch (e) {
+      console.warn('Error toggling music:', e)
     }
   }
 
@@ -127,17 +150,24 @@ export default function Navbar({ data, onOpenRsvp }) {
 
           {/* Action Buttons */}
           <div className="hidden md:flex items-center space-x-3">
-            {/* Ambient Sound Button */}
+            {/* Wedding Song Audio Button */}
             <button
-              onClick={toggleAmbientMusic}
-              title={isPlayingMusic ? "Mute ambient melody" : "Play ambient melody"}
-              className={`p-2 rounded-full border transition-all duration-300 ${
+              onClick={toggleMusic}
+              title={isPlayingMusic ? "Pause 'Kudmayi'" : "Play Wedding Song 'Kudmayi'"}
+              className={`flex items-center space-x-2 px-3 py-1.5 rounded-full border text-xs tracking-wide transition-all duration-300 ${
                 isPlayingMusic
                   ? 'border-[#cca06b] bg-[#fbf8f1] text-[#b88647] shadow-sm'
                   : 'border-[#cca06b]/30 bg-white/70 text-[#7d6b5c] hover:border-[#cca06b]'
               }`}
             >
-              {isPlayingMusic ? <Music className="w-4 h-4 animate-bounce" /> : <VolumeX className="w-4 h-4" />}
+              {isPlayingMusic ? (
+                <Music className="w-3.5 h-3.5 animate-bounce text-[#cca06b]" />
+              ) : (
+                <VolumeX className="w-3.5 h-3.5" />
+              )}
+              <span className="font-medium">
+                {isPlayingMusic ? 'Kudmayi ♪' : 'Play Music'}
+              </span>
             </button>
 
             {/* Sparkle / Celebrate Button */}
@@ -161,7 +191,8 @@ export default function Navbar({ data, onOpenRsvp }) {
           {/* Mobile Menu & Audio Button */}
           <div className="flex md:hidden items-center space-x-2">
             <button
-              onClick={toggleAmbientMusic}
+              onClick={toggleMusic}
+              title={isPlayingMusic ? "Pause 'Kudmayi'" : "Play Wedding Song 'Kudmayi'"}
               className={`p-2 rounded-full border transition-all ${
                 isPlayingMusic
                   ? 'border-[#cca06b] bg-[#fbf8f1] text-[#b88647]'
@@ -222,6 +253,32 @@ export default function Navbar({ data, onOpenRsvp }) {
               View Schedule
             </a>
           </div>
+        </div>
+      )}
+
+      {/* Hidden YouTube Audio Player Container */}
+      <div className="overflow-hidden w-0 h-0 opacity-0 pointer-events-none absolute -bottom-10 -left-10">
+        <div id="yt-wedding-audio" />
+      </div>
+
+      {/* Floating Now Playing Pill */}
+      {isPlayingMusic && (
+        <div className="fixed bottom-6 right-6 z-50 bg-[#2b2725]/90 backdrop-blur-md text-white border border-[#cca06b]/40 rounded-full pl-4 pr-3 py-2 flex items-center space-x-3 shadow-2xl text-xs transition-all animate-bounce-subtle">
+          <span className="flex space-x-0.5 items-end h-3">
+            <span className="w-0.5 bg-[#cca06b] h-3 animate-pulse" />
+            <span className="w-0.5 bg-[#cca06b] h-2 animate-bounce" />
+            <span className="w-0.5 bg-[#cca06b] h-3.5 animate-pulse" />
+          </span>
+          <span className="font-serif italic tracking-wide text-[#e8d7ba]">
+            Now Playing: Kudmayi
+          </span>
+          <button
+            onClick={toggleMusic}
+            className="text-[#cca06b] hover:text-white transition-colors p-1"
+            title="Pause Music"
+          >
+            <VolumeX className="w-3.5 h-3.5" />
+          </button>
         </div>
       )}
     </header>
